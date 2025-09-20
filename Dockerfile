@@ -23,4 +23,5 @@ RUN yarn install --network-concurrency 1
 # EXPOSE 3000
 
 # Default command to start the bot
-CMD ["npm", "start"]
+CMD ["node", "lib/client.js"]
+
