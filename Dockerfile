@@ -1,7 +1,5 @@
-# Use Node 20
 FROM node:20-bullseye
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
@@ -10,17 +8,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy local repo files (with your edits)
 COPY . .
 
-# Install dependencies
 RUN yarn install --network-concurrency 1
 
-# Expose port if needed
 EXPOSE 3000
 
-# Start bot using pm2-runtime
-CMD ["pm2-runtime", "start", "index.js", "--name", "levanter"]
+# Use npx to run pm2-runtime from node_modules
+CMD ["npx", "pm2-runtime", "start", "index.js", "--name", "levanter"]
