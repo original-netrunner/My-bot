@@ -1,21 +1,28 @@
-# Base image (Lyfe’s image already has Node.js + Puppeteer deps)
-FROM quay.io/lyfe00011/md:beta
+# Use Node.js 20 (Debian Bullseye variant for build compatibility)
+FROM node:20-bullseye
 
-# Install required system packages for WhatsApp bots
+# Install build tools & ffmpeg (many npm packages like sharp & sqlite need these)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clone your repo into /root/bot
-RUN git clone https://github.com/original-netrunner/levanter.git /root/bot
-
-# Set working directory
+# Set working directory inside container
 WORKDIR /root/bot
 
-# Install Node.js dependencies
-RUN yarn install 
+# Copy package.json and yarn.lock first (better caching)
+COPY package.json yarn.lock* ./
 
-# Expose a port if your bot has a web dashboard (optional)
-# EXPOSE 3000
+# Install dependencies
+RUN yarn install --network-concurrency 1
 
-# Default command to start the bot, changed back to pm2
+# Copy the rest of the bot’s source code
+COPY . .
+
+# Expose a port (only needed if your bot has a web dashboard; harmless otherwise)
+EXPOSE 3000
+
+# Use PM2 as process manager
 CMD ["npm", "start"]
-
-
