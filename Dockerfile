@@ -1,7 +1,7 @@
-# Use Node.js 20 (Debian Bullseye variant for build compatibility)
+# Use Node.js 20 (required by package.json engines)
 FROM node:20-bullseye
 
-# Install build tools & ffmpeg (many npm packages like sharp & sqlite need these)
+# Install system dependencies (ffmpeg is needed for media handling)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
@@ -12,17 +12,17 @@ RUN apt-get update && apt-get install -y \
 # Set working directory inside container
 WORKDIR /root/bot
 
-# Copy package.json and yarn.lock first (better caching)
+# Copy dependency files first (better Docker caching)
 COPY package.json yarn.lock* ./
 
 # Install dependencies
 RUN yarn install --network-concurrency 1
 
-# Copy the rest of the bot’s source code
+# Copy the rest of the project
 COPY . .
 
-# Expose a port (only needed if your bot has a web dashboard; harmless otherwise)
+# Expose a port (optional, if bot has a web dashboard)
 EXPOSE 3000
 
-# Use PM2 as process manager
-CMD ["npm", "start"]
+# Start the bot with PM2 (as defined in package.json scripts)
+CMD ["yarn", "docker"]
