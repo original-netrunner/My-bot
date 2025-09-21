@@ -15,6 +15,7 @@ RUN yarn install
 # Expose a port if your bot has a web dashboard (optional)
 # EXPOSE 3000
 
-# Default command to start the bot
-CMD ["node", "lib/client.js"]
+# Default command to start the bot, changed back to pm2
+CMD ["npm", "start"]
+
 
